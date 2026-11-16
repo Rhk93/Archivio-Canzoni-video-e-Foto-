@@ -234,7 +234,7 @@ const add=(k,n)=>{done.add(String(k));out.push(`# ${k} ${n}`);(LINKS[k]||[]).for
 br.forEach(b=>b.ord&&add(b.ord,b.name));Object.keys(LINKS).forEach(k=>{if(!done.has(k))add(k,'')});
 let sha;const g=await gh('/contents/links.txt');if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw new Error('accesso negato ('+g.status+')');
 const p=await gh('/contents/links.txt',{method:'PUT',body:JSON.stringify({message:'Aggiorna link fissi',content:btoa(unescape(encodeURIComponent(out.join('\n')))),...(sha?{sha}:{})})});if(!p.ok)throw new Error('GitHub '+p.status)}
-function editLinks(b){let L=(LINKS[b.ord]||[]).map(x=>({...x})),ty='video';
+function editLinks(b,t0){let L=(LINKS[b.ord]||[]).map(x=>({...x})),ty=t0||'video';
 const o=sheet(`<h3>Link fissi · ${b.ord}. ${esc(b.name)}</h3><div class="list" id="eL"></div>
 <div class="lab st">Nuovo link</div><div class="sg" id="eT"><button data-k="video">Video</button><button data-k="spartito">Spartito</button></div>
 <input type="text" id="eTi" placeholder="Titolo (es. Chitarra 1)"><input type="text" id="eU" placeholder="Incolla il link https://…" style="margin-top:8px">
@@ -274,13 +274,13 @@ $('#bM').onclick=()=>menu([{i:'edit',t:'Rinomina brano',f:async()=>{const n=awai
 const m=(await mediaOf(id)).sort((x,y)=>x.at-y.at);const G={};Object.keys(SEC).forEach(k=>G[k]=m.filter(x=>x.type===k));items=[...G.video,...G.spartito,...G.foto,...G.audio];
 const LK=LINKS[b.ord]||[],nL=k=>LK.filter(x=>x.type===k).length;
 const linkT=k=>LK.filter(x=>x.type===k).map(x=>{const y=ytImg(x.url);return `<a class="tile lk ${k==='spartito'?'sp':''}" href="${esc(x.url)}" target="_blank" rel="noopener"><div class="im" style="${y?`background-image:url(${y})`:''}">${y?PLAY:ic('link')}</div><div class="nm">${esc(x.title)}</div></a>`}).join('');
-const tiles=(l,k)=>`<div class="mg ${k==='foto'?'sq':''}">`+linkT(k)+l.map(x=>`<div class="tile ${k==='spartito'?'sp':''}" data-i="${items.indexOf(x)}"><div class="im" style="${x.thumb?`background-image:url(${url(x.thumb)})`:''}">${k==='video'?PLAY+(x.dur?`<span class="du">${fmt(x.dur)}</span>`:''):x.thumb?'':ic(k)}</div><div class="nm">${esc(x.name)}</div></div>`).join('')+`<div class="tile add ${k==='spartito'?'sp':''}" data-add="${k}"><div class="im">${ic('plus')}</div><div class="nm">Aggiungi altri</div></div></div>`;
-const auds=l=>'<div class="al">'+l.map(x=>`<div class="au" data-i="${items.indexOf(x)}"><div class="q">${ic('audio')}</div><div class="n">${esc(x.name)}<small>${fmt(x.dur)||'Audio'}</small></div></div>`).join('')+`<div class="drop" data-add="audio">+ Aggiungi altri audio</div></div>`;
+const tiles=(l,k)=>`<div class="mg ${k==='foto'?'sq':''}">`+linkT(k)+l.map(x=>`<div class="tile ${k==='spartito'?'sp':''}" data-i="${items.indexOf(x)}"><div class="im" style="${x.thumb?`background-image:url(${url(x.thumb)})`:''}">${k==='video'?PLAY+(x.dur?`<span class="du">${fmt(x.dur)}</span>`:''):x.thumb?'':ic(k)}</div><div class="nm">${esc(x.name)}</div></div>`).join('')+'</div>';
+const auds=l=>'<div class="al">'+l.map(x=>`<div class="au" data-i="${items.indexOf(x)}"><div class="q">${ic('audio')}</div><div class="n">${esc(x.name)}<small>${fmt(x.dur)||'Audio'}</small></div></div>`).join('')+'</div>';
 const sec=k=>{const l=G[k];if(!l.length&&(k==='foto'||k==='audio'))return'';
-return `<div class="sec"><div class="sh"><div class="ico">${ic(k)}</div><h2>${SEC[k]}<small>${l.length+nL(k)||''}</small></h2><button class="pill soft" data-add="${k}">${ic('plus')}Aggiungi</button></div>${l.length||nL(k)?(k==='audio'?auds(l):tiles(l,k)):`<div class="drop" data-add="${k}">Nessun ${k==='video'?'video':'spartito'}. Tocca per aggiungere${k==='spartito'?' PDF o foto':''} (puoi sceglierne più di uno).</div>`}</div>`};
-$('#main').innerHTML=`<div class="card"><div class="lab">Descrizione</div><textarea id="ds" placeholder="Scrivi una breve descrizione del brano…">${esc(b.desc)}</textarea></div>`+(TOK?`<button class="pill" id="bL">${ic('link')}Gestisci link fissi</button>`:'')+Object.keys(SEC).map(sec).join('')+
-`<div class="sec" style="display:flex;gap:8px;flex-wrap:wrap">${!G.foto.length?`<button class="pill soft" data-add="foto">${ic('foto')}Aggiungi foto</button>`:''}${!G.audio.length?`<button class="pill soft" data-add="audio">${ic('audio')}Aggiungi audio</button>`:''}</div><div class="cp">Copyright © Ignazio Paolicelli</div>`;
-$('#bL')?.addEventListener('click',()=>editLinks(b));
+return `<div class="sec"><div class="sh"><div class="ico">${ic(k)}</div><h2>${SEC[k]}<small>${l.length+nL(k)||''}</small></h2>${TOK&&(k==='video'||k==='spartito')?`<button class="pill soft" data-lk="${k}">${ic('link')}Aggiungi link fissi</button>`:''}</div>${l.length||nL(k)?(k==='audio'?auds(l):tiles(l,k)):`<div class="drop">Nessun ${k==='video'?'video':'spartito'} ancora.</div>`}</div>`};
+$('#main').innerHTML=`<div class="card"><div class="lab">Descrizione</div><textarea id="ds" placeholder="Scrivi una breve descrizione del brano…">${esc(b.desc)}</textarea></div>`+Object.keys(SEC).map(sec).join('')+
+`<div class="cp">Copyright © Ignazio Paolicelli</div>`;
+document.querySelectorAll('[data-lk]').forEach(x=>x.onclick=()=>editLinks(b,x.dataset.lk));
 let tm;$('#ds').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>{b.desc=e.target.value;b.upd=Date.now();put('brani',b)},400)};
 document.querySelectorAll('[data-i]').forEach(t=>t.onclick=()=>view(+t.dataset.i));
 document.querySelectorAll('[data-add]').forEach(t=>t.onclick=()=>{pend=t.dataset.add;$('#fi').accept=ACC[pend];$('#fi').click()})}
