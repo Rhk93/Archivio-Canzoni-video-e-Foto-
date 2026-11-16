@@ -233,7 +233,7 @@ async function saveLinks(){const br=(await all('brani')).sort((a,b)=>(a.ord||999
 const add=(k,n)=>{done.add(String(k));out.push(`# ${k} ${n}`);(LINKS[k]||[]).forEach(x=>out.push(`${x.type}: ${x.title} | ${x.url}`));out.push('')};
 br.forEach(b=>b.ord&&add(b.ord,b.name));Object.keys(LINKS).forEach(k=>{if(!done.has(k))add(k,'')});
 let sha;const g=await gh('/contents/links.txt');if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw new Error('accesso negato ('+g.status+')');
-const p=await gh('/contents/links.txt',{method:'PUT',body:JSON.stringify({message:'Aggiorna link fissi',content:btoa(unescape(encodeURIComponent(out.join('\n')))),...(sha?{sha}:{})})});if(!p.ok)throw new Error('GitHub '+p.status)}
+const p=await gh('/contents/links.txt',{method:'PUT',body:JSON.stringify({message:'Aggiorna link fissi',content:btoa(unescape(encodeURIComponent(out.join('\n')))),...(sha?{sha}:{})})});if(!p.ok)throw new Error(p.status===403?'il codice non ha il permesso “Contents: Read and write” su questo repository.':'GitHub '+p.status)}
 function editLinks(b,t0){let L=(LINKS[b.ord]||[]).map(x=>({...x})),ty=t0||'video';
 const o=sheet(`<h3>Link fissi · ${b.ord}. ${esc(b.name)}</h3><div class="list" id="eL"></div>
 <div class="lab st">Nuovo link</div><div class="sg" id="eT"><button data-k="video">Video</button><button data-k="spartito">Spartito</button></div>
@@ -244,9 +244,9 @@ const rd=()=>{o.querySelectorAll('#eT button').forEach(x=>x.classList.toggle('on
 $('#eL').innerHTML=L.length?L.map((x,i)=>`<div class="lrow">${ic(x.type)}<div class="n">${esc(x.title)}<small>${esc(x.url)}</small></div><button data-d="${i}">${ic('trash')}</button></div>`).join(''):'<div class="sub">Nessun link ancora.</div>';
 $('#eL').querySelectorAll('[data-d]').forEach(x=>x.onclick=()=>{L.splice(+x.dataset.d,1);rd()})};rd();
 o.querySelectorAll('#eT button').forEach(x=>x.onclick=()=>{ty=x.dataset.k;rd()});
-$('#eAdd').onclick=()=>{const u=$('#eU').value.trim();if(!/^https?:\/\//.test(u)){$('#eU').focus();return}L.push({type:ty,title:$('#eTi').value.trim().replace(/\|/g,'/')||'Link',url:u});$('#eTi').value='';$('#eU').value='';rd()};
+const addCur=()=>{let u=$('#eU').value.trim();if(u&&!/^https?:\/\//i.test(u)&&/\./.test(u))u='https://'+u;if(!/^https?:\/\/\S+\.\S+/i.test(u)){$('#eU').focus();return false}L.push({type:ty,title:$('#eTi').value.trim().replace(/\|/g,'/')||'Link',url:u});$('#eTi').value='';$('#eU').value='';rd();return true};$('#eAdd').onclick=addCur;
 $('#eNo').onclick=()=>o.remove();
-$('#eOk').onclick=async()=>{const bt=$('#eOk');bt.textContent='Salvo…';bt.disabled=true;const old=LINKS[b.ord];
+$('#eOk').onclick=async()=>{if($('#eU').value.trim()&&!addCur()){alertBox('Il link non è valido: deve essere un indirizzo web (https://…).');return}const bt=$('#eOk');bt.textContent='Salvo…';bt.disabled=true;const old=LINKS[b.ord];
 try{LINKS[b.ord]=L;await saveLinks();o.remove();openF(b.id,false);alertBox('Salvato ✓ Gli alunni lo vedranno tra circa un minuto.')}catch(e){LINKS[b.ord]=old;bt.textContent='Salva';bt.disabled=false;alertBox('Errore nel salvataggio: '+esc(e.message||e))}}}
 
 /* ---------- Elenco brani ---------- */
