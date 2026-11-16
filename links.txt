@@ -21,6 +21,10 @@ video: Chitarra 1 | https://mega.nz/file/5xEhHSKD#NcPDpCbmxe1_6nbh_AqMV2BUbgBgvo
 spartito: Spartito - Chitarra 2 | https://mega.nz/file/4t9lBbja#x4W2qU950tMOpyKdZGjuIBnC7z0NmhgC_Hjkuc355Hc
 
 # 5 A Christmas Carol (Bocelli) – God Bless Us Everyone
+spartito: Spartito - Chitarra 1 | https://mega.nz/file/4kk0yAhZ#RQOHU6RRukemdlmb2vkRYTMCDJ3Xm3MI4Hk2fGH3Ua4
+spartito: Spartito - Chitarra 2 | https://mega.nz/file/ltNFDC6L#85vgWtNGqFF61AFeia9bHwE_KgpwMpEOlBscFKkTuXw
+video: Chitarra 2 | https://mega.nz/file/Rt92jZ4L#zoqyR3Cqmy17-m8vaX5CD80GjcxzudjsiyLsyIeBIss
+video: Chitarra 1 | https://mega.nz/file/cx9WhDiA#maOOwj0nKrPrm4b-_G9QTtnLuiqE5cuQYpip98DLuvg
 
 # 6 Home Alone
 
