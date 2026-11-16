@@ -125,9 +125,28 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 #ld.on{display:grid}
 @keyframes pop{from{transform:scale(.92);opacity:0}}
 @keyframes fd{from{opacity:0}}
+
+.cover .art{position:absolute;inset:0}
+.cover .art svg,.banner svg{width:100%;height:100%;display:block}
+.banner{border-radius:20px;overflow:hidden;aspect-ratio:16/7;margin:4px 0 10px;box-shadow:0 6px 18px #1f243318}
+/* ---- Decorazioni di Natale ---- */
+.xm{display:none}
+body.xmas .xm{display:block}
+body.xmas h1 .xm{display:inline-block}
+h1 .tree{width:1.1em;height:1.3em;vertical-align:-.15em}
+body.xmas header::after{content:"";position:absolute;left:0;right:0;bottom:-15px;height:22px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='22'%3E%3Cpath d='M0 3 Q25 14 50 3 Q75 14 100 3 Q125 14 150 3' fill='none' stroke='%232e7d4f' stroke-width='2.5'/%3E%3Crect x='23' y='8' width='4' height='3' fill='%23a0a0a0'/%3E%3Ccircle cx='25' cy='15' r='5' fill='%23e74c3c'/%3E%3Crect x='73' y='8' width='4' height='3' fill='%23a0a0a0'/%3E%3Ccircle cx='75' cy='15' r='5' fill='%23f5c542'/%3E%3Crect x='123' y='8' width='4' height='3' fill='%23a0a0a0'/%3E%3Ccircle cx='125' cy='15' r='5' fill='%233498db'/%3E%3C/svg%3E") repeat-x;background-size:150px 22px}
+body.xmas main{padding-top:22px}
+.scene svg{display:block;width:100%;max-width:520px;margin:0 auto}
+.scene{padding:0 18px calc(10px + env(safe-area-inset-bottom))}
+#snow{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+#snow i{position:absolute;top:-24px;color:#a9c2d9;font-style:normal;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(200deg)}}
+@media (prefers-reduced-motion:reduce){#snow{display:none!important}}
 </style></head><body>
 <header id="hd"></header>
 <main id="main"></main>
+<div class="xm scene" id="scene"></div>
+<div class="xm" id="snow"></div>
 <div id="vw"><div class="top"><button class="ib" id="vClose"></button><div class="tt" id="vT"></div><button class="ib" id="vDel"></button></div><div class="ct" id="vC"></div></div>
 <div id="ld">Caricamento…</div>
 <input type="file" id="fi" multiple hidden>
@@ -145,11 +164,45 @@ more:'<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle c
 link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',trash:'<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>',close:'<path d="M6 6l12 12M18 6L6 18"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>'};
 const ic=n=>'<svg class="si" viewBox="0 0 24 24">'+PATHS[n]+'</svg>';
 const NOTE='<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M24 46V18l22-6v28"/><path d="M24 26l22-6"/><circle cx="17.5" cy="46" r="6.5" fill="currentColor" stroke="none"/><circle cx="39.5" cy="40" r="6.5" fill="currentColor" stroke="none"/></svg>';
+const TG='<polygon points="20,7 30,20 25,20 34,32 27,32 37,44 3,44 13,32 6,32 15,20 10,20" fill="#2e7d4f"/><rect x="17" y="44" width="6" height="4" fill="#8b5a2b"/><polygon points="20,0 22,5 27,5 23,8 25,13 20,10 15,13 17,8 13,5 18,5" fill="#f5c542"/><circle cx="16" cy="26" r="2" fill="#e74c3c"/><circle cx="25" cy="36" r="2" fill="#f5c542"/><circle cx="13" cy="39" r="2" fill="#3498db"/><circle cx="23" cy="18" r="1.6" fill="#e74c3c"/><circle cx="29" cy="40" r="1.8" fill="#e74c3c"/>';
+const TREE='<svg viewBox="0 0 40 48" class="tree">'+TG+'</svg>';
+const SCENE='<svg viewBox="0 0 400 120"><g fill="#f5c542"><circle cx="120" cy="18" r="1.6"/><circle cx="160" cy="34" r="1.2"/><circle cx="250" cy="14" r="1.8"/><circle cx="300" cy="30" r="1.2"/><circle cx="60" cy="12" r="1.2"/></g>'+
+'<path d="M0 96 Q100 72 200 94 T400 88 V120 H0Z" fill="#fff" stroke="#ead9cf"/>'+
+[[18,40,1.15],[78,58,.8],[322,46,1],[362,62,.72]].map(([x,y,k])=>`<g transform="translate(${x},${y}) scale(${k})">${TG}</g>`).join('')+
+'<circle cx="200" cy="86" r="13" fill="#fff" stroke="#d9cfc8"/><circle cx="200" cy="66" r="9" fill="#fff" stroke="#d9cfc8"/><circle cx="197" cy="64" r="1.2" fill="#333"/><circle cx="203" cy="64" r="1.2" fill="#333"/><path d="M200 67 l7 1.5 -7 1.5z" fill="#e67e22"/><rect x="191" y="73" width="18" height="4" rx="2" fill="#c0392b"/><rect x="204" y="73" width="4" height="10" rx="2" fill="#c0392b"/><rect x="192" y="56" width="16" height="3" fill="#2b1d1a"/><rect x="195" y="47" width="10" height="10" fill="#2b1d1a"/><circle cx="200" cy="83" r="1.3" fill="#333"/><circle cx="200" cy="90" r="1.3" fill="#333"/>'+
+'<rect x="246" y="80" width="22" height="16" rx="2" fill="#c0392b"/><rect x="255" y="80" width="4" height="16" fill="#f5c542"/><rect x="246" y="86" width="22" height="3" fill="#f5c542"/><path d="M257 80q-7-8-9 0zM257 80q7-8 9 0z" fill="#f5c542"/><rect x="272" y="85" width="16" height="11" rx="2" fill="#2e7d4f"/><rect x="278" y="85" width="4" height="11" fill="#fff"/><rect x="133" y="84" width="14" height="12" rx="2" fill="#3498db"/><rect x="138" y="84" width="4" height="12" fill="#fff"/></svg>';
+const sv=c=>'<svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice">'+c+'</svg>';
+const ST=(c,a)=>'<g fill="'+c+'">'+a.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r||1}"/>`).join('')+'</g>';
+const K=(x,b,sk,h,hat)=>`<path d="M${x-10} 100L${x-8} 77Q${x} 71 ${x+8} 77L${x+10} 100Z" fill="${b}"/><circle cx="${x}" cy="64" r="7.5" fill="${sk}"/><path d="M${x-7.5} 63a7.5 7.5 0 0 1 15 0q-7.5-5-15 0z" fill="${h}"/><ellipse cx="${x}" cy="68" rx="1.6" ry="2" fill="#5a1f1f"/><circle cx="${x-2.6}" cy="63" r=".9" fill="#222"/><circle cx="${x+2.6}" cy="63" r=".9" fill="#222"/>`+(hat?`<path d="M${x-8} 59l8-12l9 9z" fill="#c0392b"/><circle cx="${x+9}" cy="56" r="2" fill="#fff"/><rect x="${x-8.5}" y="57.5" width="17" height="3" rx="1.5" fill="#fff"/>`:'');
+const TRAIN='<rect y="95" width="160" height="2.5" fill="#666"/><rect x="8" y="62" width="54" height="25" rx="3" fill="#2e7d4f"/><rect x="14" y="67" width="9" height="8" fill="#f5c542"/><rect x="28" y="67" width="9" height="8" fill="#f5c542"/><rect x="42" y="67" width="9" height="8" fill="#f5c542"/><rect x="88" y="66" width="46" height="19" rx="8" fill="#232323"/><rect x="66" y="56" width="26" height="31" fill="#232323"/><rect x="72" y="61" width="13" height="9" fill="#f5c542"/><rect x="63" y="52" width="32" height="5" fill="#c0392b"/><rect x="118" y="53" width="7" height="14" fill="#232323"/><circle cx="135" cy="72" r="3.5" fill="#fdf3c4"/><path d="M132 85l11 10h-12z" fill="#c0392b"/><g fill="#c0392b" stroke="#232323" stroke-width="2"><circle cx="20" cy="90" r="4"/><circle cx="50" cy="90" r="4"/><circle cx="80" cy="89" r="6"/><circle cx="101" cy="91" r="4.5"/><circle cx="120" cy="91" r="4.5"/></g>';
+const ART={
+1:sv('<defs><linearGradient id="ga1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6c5ce7"/><stop offset=".65" stop-color="#fd79a8"/><stop offset="1" stop-color="#ffd3a5"/></linearGradient></defs><rect width="160" height="120" fill="url(#ga1)"/>'+ST('#fff',[[20,14,1.3],[50,8],[80,20,1.2],[140,40],[34,40],[104,10,1.4],[150,12]])+'<circle cx="128" cy="26" r="12" fill="#fff6d5"/><path d="M0 94Q50 80 100 92T160 86V120H0Z" fill="#fff"/><g transform="translate(16,58) scale(.75)">'+TG+'</g>'+
+'<g stroke="#6b4a2c" stroke-width="2" stroke-linecap="round" fill="none"><path d="M83 44q-4-8-1-14M82 36q-5-1-7-5M90 43q3-8 9-11M95 35q4 0 7-3"/></g>'+
+'<g fill="#a0683e"><ellipse cx="64" cy="76" rx="17" ry="9"/><rect x="52" y="80" width="4" height="13" rx="2"/><rect x="59" y="81" width="4" height="13" rx="2"/><rect x="68" y="81" width="4" height="13" rx="2"/><rect x="75" y="80" width="4" height="13" rx="2"/><path d="M74 72L82 56L90 60L82 76Z"/><circle cx="86" cy="52" r="9"/><ellipse cx="78" cy="47" rx="4" ry="2.2" transform="rotate(-30 78 47)"/><ellipse cx="95" cy="46" rx="4" ry="2.2" transform="rotate(30 95 46)"/><ellipse cx="47" cy="72" rx="3" ry="2"/></g>'+
+'<ellipse cx="64" cy="80" rx="10" ry="4" fill="#f2dcc0"/><ellipse cx="92" cy="56" rx="6.5" ry="4.8" fill="#d4a373"/><ellipse cx="97" cy="54.5" rx="2.6" ry="2" fill="#4a3426"/><circle cx="85" cy="49" r="2.4" fill="#2b1d1a"/><circle cx="85.8" cy="48.2" r=".8" fill="#fff"/><path d="M88 58q3 3 6 0" stroke="#4a3426" stroke-width="1.2" fill="none" stroke-linecap="round"/><circle cx="82" cy="55" r="2" fill="#ff8fab" opacity=".7"/>'+
+'<path d="M77 65q6 4 12 0" stroke="#e74c3c" stroke-width="4" stroke-linecap="round" fill="none"/><rect x="85" y="65" width="4" height="9" rx="2" fill="#e74c3c"/><circle cx="82" cy="70" r="2.8" fill="#f5c542"/>'+
+'<rect x="112" y="84" width="16" height="12" rx="2" fill="#e74c3c"/><rect x="118" y="84" width="4" height="12" fill="#f5c542"/><rect x="130" y="88" width="12" height="8" rx="2" fill="#00b894"/><rect x="134" y="88" width="4" height="8" fill="#fff"/>'+
+ST('#f5c542',[[110,30,1.6],[60,30,1.4],[30,70,1.4]])+ST('#74b9ff',[[120,60,1.4],[70,14,1.4]])+ST('#fff',[[40,100,1.6],[150,100,1.6],[100,104,1.4]])),
+2:sv('<rect width="160" height="120" fill="#7a2531"/><rect y="100" width="160" height="20" fill="#4a1820"/><path d="M0 4Q20 14 40 4Q60 14 80 4Q100 14 120 4Q140 14 160 4" stroke="#2e7d4f" stroke-width="3" fill="none"/>'+ST('#f5c542',[[20,10,2.5],[100,10,2.5]])+ST('#e74c3c',[[60,10,2.5],[140,10,2.5]])+'<g transform="translate(126,50) scale(.8)">'+TG+'</g>'+K(28,'#2e86de','#f3c9a8','#3b2a20')+'<g transform="rotate(-25 31 88)"><rect x="31" y="70" width="3" height="18" fill="#5a3a22"/><circle cx="32.5" cy="90" r="6" fill="#c8915a"/><circle cx="32.5" cy="96" r="7" fill="#c8915a"/><circle cx="32.5" cy="92" r="1.8" fill="#3b2a20"/></g>'+K(53,'#f5c542','#c98d64','#222',1)+K(78,'#2e7d4f','#f3c9a8','#e0b04a')+'<rect x="71" y="80" width="14" height="10" fill="#fff" transform="rotate(-8 78 85)"/>'+K(103,'#e84393','#f3c9a8','#7a3b1e',1)+ST('#f5c542',[[110,84,2.2],[113,88,2.2]])+'<g fill="#ffd36b" font-size="15" font-family="serif"><text x="38" y="42">♪</text><text x="66" y="32">♫</text><text x="94" y="44">♪</text><text x="16" y="34">♫</text><text x="112" y="28">♪</text></g>'),
+3:(()=>{const H=(x,w,h,c,b)=>{const t=b-h;return `<rect x="${x}" y="${t}" width="${w}" height="${h}" fill="${c}"/><path d="M${x-1.5} ${t}L${x+w/2} ${t-7}L${x+w+1.5} ${t}Z" fill="#fff"/><rect x="${x+3}" y="${t+4}" width="4" height="5" fill="#ffd36b"/><rect x="${x+w-7}" y="${t+4}" width="4" height="5" fill="#ffd36b"/>`+(h>18?`<rect x="${x+w/2-2.5}" y="${b-8}" width="5" height="8" fill="#7a3b1e"/>`:'')};
+return sv('<defs><linearGradient id="ga3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3a6b"/><stop offset=".7" stop-color="#8e7cc3"/><stop offset="1" stop-color="#f3a683"/></linearGradient></defs><rect width="160" height="120" fill="url(#ga3)"/>'+ST('#fff',[[60,10,1.2],[90,18],[120,8,1.3],[150,22],[105,30]])+'<path d="M140 12a8 8 0 1 0 7 11a6 6 0 1 1-7-11z" fill="#fff6d5"/>'+
+'<path d="M40 76L70 52L92 66L118 46L140 62L160 54V90H40Z" fill="#b9c8e8"/><path d="M70 52L76 57L72 58L66 55ZM118 46L124 51L119 52L113 50Z" fill="#fff"/>'+
+'<path d="M40 96Q100 86 160 92V120H40Z" fill="#eef3fa"/>'+
+H(58,12,14,'#c7b8e8',92)+H(96,12,16,'#e6dcf7',92)+H(146,12,14,'#c7b8e8',92)+
+H(52,18,20,'#e17055',104)+H(68,14,26,'#fdcb6e',104)+H(104,12,18,'#55efc4',104)+H(137,20,22,'#74b9ff',104)+
+'<rect x="117" y="70" width="18" height="34" fill="#f5f0e8"/><path d="M115 70L126 61L137 70Z" fill="#c0392b"/><rect x="122" y="44" width="8" height="20" fill="#f5f0e8"/><path d="M120 44L126 30L132 44Z" fill="#c0392b"/><path d="M126 23v7M123.5 25.5h5" stroke="#f5c542" stroke-width="1.3"/><circle cx="126" cy="51" r="2.5" fill="#ffd36b"/><path d="M122 104v-8a4 4 0 0 1 8 0v8Z" fill="#ffd36b"/><rect x="119" y="76" width="4" height="6" rx="2" fill="#ffd36b"/><rect x="129" y="76" width="4" height="6" rx="2" fill="#ffd36b"/>'+
+'<g transform="translate(83,70) scale(.55)">'+TG+'</g>'+
+'<path d="M50 82Q92 96 158 80" stroke="#2e7d4f" stroke-width="1.2" fill="none"/>'+ST('#e74c3c',[[60,86,1.6],[90,91,1.6],[124,89,1.6],[150,83,1.6]])+ST('#f5c542',[[75,89,1.6],[106,91,1.6],[138,86,1.6]])+
+'<path d="M0 120V56L16 40L30 52L44 46L66 120Z" fill="#dfe8f3"/><path d="M16 40L30 52L44 46L66 120H38L24 70Z" fill="#b4c4dc"/><path d="M8 48L16 40L24 47L18 46L15 50L11 47Z" fill="#fff"/><g transform="translate(6,74) scale(.45)"><polygon points="20,7 30,20 25,20 34,32 27,32 37,44 3,44 13,32 6,32 15,20 10,20" fill="#2e6b4f"/><rect x="17" y="44" width="6" height="4" fill="#6b4a2c"/></g>'+ST('#fff',[[20,20,1.3],[45,30,1.2],[75,40,1.2],[150,70,1.2]]))})(),
+4:sv('<rect width="160" height="120" fill="#8fd0f5"/><circle cx="28" cy="24" r="12" fill="#ffe066"/><path d="M60 30q6-8 14-2q8-6 14 2z" fill="#fff"/><path d="M0 82Q40 66 80 78T160 70V120H0Z" fill="#fff"/><path d="M0 88Q80 80 160 88V120H0Z" fill="#eef5fb"/><g transform="translate(118,40) scale(.6)">'+TG+'</g><g transform="translate(138,46) scale(.5)">'+TG+'</g>'+TRAIN+'<g fill="#fff" stroke="#d5dde5"><circle cx="122" cy="45" r="6"/><circle cx="131" cy="35" r="8"/><circle cx="144" cy="24" r="10"/></g>'),
+5:sv('<rect width="160" height="120" fill="#8a8f9c"/>'+[[0,30,62,'#6b5a4c',0],[28,26,52,'#5a4d45',0],[52,34,70,'#7a6656',1],[84,28,56,'#5f5048',0],[110,30,66,'#6e5c50',0],[138,24,50,'#574a42',0]].map(([x,w,h,c,lit])=>{const t=102-h;return `<rect x="${x+w-9}" y="${t-16}" width="5" height="10" fill="#3b302a"/><circle cx="${x+w-6}" cy="${t-20}" r="3" fill="#b8bcc6"/><circle cx="${x+w-3}" cy="${t-26}" r="4" fill="#c8ccd4"/><rect x="${x}" y="${t}" width="${w}" height="${h}" fill="${c}"/><path d="M${x-2} ${t}L${x+w/2} ${t-12}L${x+w+2} ${t}Z" fill="#3b302a"/><path d="M${x-2} ${t}L${x+w/2} ${t-12}L${x+w+2} ${t}L${x+w-2} ${t}L${x+w/2} ${t-9}L${x+2} ${t}Z" fill="#fff"/>`+[x+5,x+w-12].map(wx=>`<rect x="${wx}" y="${t+8}" width="7" height="8" fill="${lit?'#ffcf70':'#2b2622'}"/>`+(lit?'':`<path d="M${wx} ${t+8}l7 8M${wx+7} ${t+8}l-7 8" stroke="#8a6f5a" stroke-width=".8"/>`)).join('')+(lit?`<rect x="${x+w/2-5}" y="${86}" width="10" height="16" fill="#3b2a20"/><circle cx="${x+w/2}" cy="${82}" r="3.5" fill="none" stroke="#2e7d4f" stroke-width="1.8"/>`:'')}).join('')+'<rect y="102" width="160" height="18" fill="#e9e6e1"/>'+ST('#c9c3ba',[[10,110,1.5],[30,114,1.5],[50,109,1.5],[75,113,1.5],[100,110,1.5],[125,115,1.5],[150,111,1.5]])+'<rect x="128" y="62" width="3" height="40" fill="#222"/><path d="M124 54h11l-2 9h-7z" fill="#222"/><rect x="126" y="56" width="7" height="6" fill="#e8b85a"/>'+ST('#fff',[[15,20,1.3],[45,12,1.2],[95,22,1.3],[140,14,1.2],[70,8,1.2],[155,40,1.3],[22,46,1.2]])),
+6:sv('<rect width="160" height="120" fill="#1f3a5f"/>'+ST('#fff',[[12,12],[30,30],[140,10],[150,30],[100,8,1.2]])+'<path d="M128 18a9 9 0 1 0 8 13a7 7 0 1 1-8-13z" fill="#fdf3c4"/><rect x="44" y="26" width="8" height="14" fill="#7a3b1e"/><rect x="108" y="26" width="8" height="14" fill="#7a3b1e"/><rect x="22" y="60" width="116" height="44" fill="#b5523a"/><path d="M16 62L40 38H120L144 62Z" fill="#3b2a20"/><path d="M16 62L40 38H120L144 62H138L118 42H42L22 62Z" fill="#fff"/><path d="M60 62L80 46L100 62Z" fill="#a8432f" stroke="#fff" stroke-width="2"/><g fill="#f4efe6"><rect x="64" y="62" width="3" height="42"/><rect x="93" y="62" width="3" height="42"/></g><rect x="72" y="80" width="16" height="24" fill="#2e7d4f"/><path d="M80 80v24" stroke="#1d5235"/><circle cx="80" cy="72" r="4" fill="none" stroke="#2e7d4f" stroke-width="2"/><g fill="#ffd36b">'+[30,46,108,124].flatMap(x=>[[x,68],[x,86]]).map(([x,y])=>`<rect x="${x}" y="${y}" width="10" height="12"/>`).join('')+'</g>'+ST('#e74c3c',[[22,60,1.7],[46,38,1.7],[78,38,1.7],[110,38,1.7],[132,54,1.7]])+ST('#f5c542',[[30,52,1.7],[62,38,1.7],[94,38,1.7],[120,40,1.7],[140,60,1.7]])+'<polygon points="96,30 70,44 82,48" fill="#fdf3c4" opacity=".35"/>'+[[62,'#444'],[96,'#2b3d5a']].map(([x,c],i)=>`<rect x="${x-5}" y="25" width="10" height="13" rx="3" fill="${c}"/><path d="M${x-5} 29h10M${x-5} 33h10" stroke="#ccc" stroke-width="1.2"/><circle cx="${x}" cy="20" r="4.5" fill="#f3c9a8"/><path d="M${x-4.6} 19a4.6 4.6 0 0 1 9.2 0z" fill="#111"/><rect x="${x-4.5}" y="19" width="9" height="2.4" fill="#111"/>`+(i?'':`<circle cx="${x+9}" cy="31" r="5" fill="#d8c3a0"/><path d="M${x+7} 26l2-2l2 2" stroke="#a88" fill="none"/>`)).join('')+'<rect y="102" width="160" height="18" fill="#f4f7fb"/>'),
+7:sv('<rect width="160" height="120" fill="#1b2a52"/><path d="M0 40Q40 10 80 30T160 20" stroke="#4be3b0" stroke-width="10" opacity=".25" fill="none"/><path d="M0 50Q50 25 90 42T160 34" stroke="#7cc4ea" stroke-width="7" opacity=".25" fill="none"/>'+ST('#fff',[[15,15],[45,8,1.2],[120,12],[148,40],[100,6]])+'<path d="M0 120V96Q80 80 160 96V120Z" fill="#d8f1fb"/><g fill="#bfe8f8" stroke="#7cc4ea" stroke-width="1.2">'+[[36,62,10,16],[114,62,10,16],[52,50,12,16],[96,50,12,16],[72,32,16,24]].map(([x,y,w,s])=>`<rect x="${x}" y="${y}" width="${w}" height="${96-y}"/><path d="M${x-2} ${y}L${x+w/2} ${y-s}L${x+w+2} ${y}Z"/>`).join('')+'<rect x="40" y="72" width="80" height="24"/></g><path d="M72 96V84a8 8 0 0 1 16 0V96Z" fill="#5fb8e6"/><g fill="#5fb8e6">'+[[78,44],[56,60],[100,60],[39,70],[117,70],[52,80],[104,80]].map(([x,y])=>`<rect x="${x}" y="${y}" width="4" height="6" rx="2"/>`).join('')+'</g><path d="M80 8v14M76 14h8" stroke="#fff" stroke-width="1.5"/><path d="M46 76l6-6M108 76l6-6M66 92l4-4" stroke="#fff" stroke-width="1" opacity=".8"/>')};
 const PLAY='<div class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></div>';
 const HUES=['#6c5ce7','#00b894','#e17055','#0984e3','#e84393','#f0a500','#00a8b5','#8e44ad'];
 const SEC={video:'Video',spartito:'Spartito',foto:'Foto',audio:'Audio'};
 const ACC={video:'video/*',spartito:'application/pdf,image/*',foto:'image/*',audio:'audio/*'};
-const SEED=['Rudolph renna dal naso rosso','Il Grinch – Welcome Christmas','A la nanita nana','Polar Express – When Christmas comes to town','A Christmas Carol (Bocelli) – God Bless Us Everyone','Home Alone','Frozen – Let It Go'];
+const SEED=['Rudolph renna dal naso rosso','A la nanita nana','Il Grinch – Welcome Christmas','Polar Express – When Christmas comes to town','A Christmas Carol (Bocelli) – God Bless Us Everyone','Home Alone','Frozen – Let It Go'];
 let db,cur=null,urls=[],items=[],vi=-1,pend=null;
 const Pr=r=>new Promise((a,b)=>{r.onsuccess=()=>a(r.result);r.onerror=()=>b(r.error)});
 const st=(s,m='readonly')=>db.transaction(s,m).objectStore(s);
@@ -172,8 +225,8 @@ const ytImg=u=>{const i=ytId(u);return i?`https://img.youtube.com/vi/${i}/hqdefa
 const hue=b=>HUES[((b.ord||1)-1)%HUES.length];
 
 /* ---------- Impostazioni ---------- */
-const DEF={theme:'auto',acc:'#6c5ce7',bg:'',font:'ou',size:16};
-let S={...DEF};try{S={...DEF,...JSON.parse(localStorage.getItem('brani-set2')||'{}')}}catch(e){}
+const DEF={theme:'natale',acc:'#c0392b',bg:'',font:'ou',size:16};
+let S={...DEF};try{S={...DEF,...JSON.parse(localStorage.getItem('brani-set3')||'{}')}}catch(e){}
 const FONTS={ou:['Outfit','"Outfit",system-ui,sans-serif'],po:['Poppins','"Poppins",system-ui,sans-serif'],nu:['Nunito','"Nunito",system-ui,sans-serif'],qu:['Quicksand','"Quicksand",system-ui,sans-serif']};
 if(!FONTS[S.font])S.font='ou';
 const mq=matchMedia('(prefers-color-scheme: dark)');
@@ -191,12 +244,12 @@ neon:{n:'Neon',bg:'#0b0b10',card:'#16161f',txt:'#f2f2f7',sub:'#8d8da3',line:'#26
 vino:{n:'Vino',bg:'#1a0e12',card:'#27161c',txt:'#f5e9ec',sub:'#a8878f',line:'#3a2129',acc:'#ff5d73',dk:1},
 caffe:{n:'Caffè',bg:'#1b1512',card:'#28201b',txt:'#f2e9e1',sub:'#a69484',line:'#3a2f28',acc:'#d9a066',dk:1}};
 const BASE={light:{n:'Chiaro',bg:'#f4f5fb',card:'#fff',acc:'#6c5ce7'},dark:{n:'Scuro',bg:'#11131a',card:'#1b1e28',acc:'#6c5ce7'},auto:{n:'Automatico',bg:'linear-gradient(90deg,#f4f5fb 50%,#11131a 50%)',card:'#9aa0b4',acc:'#6c5ce7'}};
-function apply(){const p=PRE[S.theme];const dk=p?!!p.dk:(S.theme==='dark'||(S.theme==='auto'&&mq.matches));document.body.classList.toggle('dark',dk);
+function apply(){const p=PRE[S.theme];const dk=p?!!p.dk:(S.theme==='dark'||(S.theme==='auto'&&mq.matches));document.body.classList.toggle('dark',dk);document.body.classList.toggle('xmas',S.theme==='natale'||S.theme==='neve');
 const r=document.body.style;r.setProperty('--acc',S.acc);r.setProperty('--font',FONTS[S.font][1]);r.setProperty('--fs',S.size+'px');
 ['card','txt','sub','line'].forEach(k=>p?r.setProperty('--'+k,p[k]):r.removeProperty('--'+k));
 const bg=S.bg||(p&&p.bg);bg?r.setProperty('--bg',bg):r.removeProperty('--bg');
 document.querySelector('meta[name=theme-color]').content=bg||(dk?'#11131a':'#f4f5fb');
-try{localStorage.setItem('brani-set2',JSON.stringify(S))}catch(e){}}
+try{localStorage.setItem('brani-set3',JSON.stringify(S))}catch(e){}}
 mq.addEventListener?.('change',apply);apply();
 
 /* ---------- Finestre ---------- */
@@ -252,16 +305,16 @@ try{LINKS[b.ord]=L;await saveLinks();o.remove();openF(b.id,false);alertBox('Salv
 /* ---------- Elenco brani ---------- */
 async function home(){cur=null;clearUrls();window.scrollTo(0,0);
 const br=(await all('brani')).sort((a,b)=>(a.ord||999)-(b.ord||999)),md=await all('media');
-$('#hd').innerHTML=`<div class="tx"><h1>I miei Brani</h1><div class="sub">${br.length} ${br.length===1?'brano':'brani'}</div></div><button class="ib" id="bS" title="Personalizza">${ic('set')}</button><button class="pill" id="bN">${ic('plus')}Nuovo</button>`;
+$('#hd').innerHTML=`<div class="tx"><h1><span class="xm">${TREE}</span>I miei Brani</h1><div class="sub">${br.length} ${br.length===1?'brano':'brani'}</div></div><button class="ib" id="bS" title="Personalizza">${ic('set')}</button><button class="pill" id="bN">${ic('plus')}Nuovo</button>`;
 $('#bS').onclick=settings;$('#bN').onclick=newBrano;
 if(!br.length){$('#main').innerHTML='<div class="empty">Nessun brano. Tocca <b>Nuovo</b> per crearne uno.</div><div class="cp">Copyright © Ignazio Paolicelli</div>';return}
 $('#main').innerHTML='<div class="grid">'+br.map(b=>{const m=md.filter(x=>x.branoId===b.id).sort((x,y)=>y.at-x.at);
 const th=m.filter(x=>x.thumb).slice(0,4);const n=th.length>=4?4:th.length>=2?2:th.length;
 const LK=LINKS[b.ord]||[],yc=LK.map(x=>ytImg(x.url)).filter(Boolean)[0];
-const cells=n?th.slice(0,n).map(x=>`<div class="t" style="background-image:url(${url(x.thumb)})"></div>`).join(''):yc?`<div class="t" style="background-image:url(${yc})"></div>`:`<div class="lg">${NOTE}</div>`;
+const cells=b.seed&&ART[b.ord]?`<div class="art">${ART[b.ord]}</div>`:n?th.slice(0,n).map(x=>`<div class="t" style="background-image:url(${url(x.thumb)})"></div>`).join(''):yc?`<div class="t" style="background-image:url(${yc})"></div>`:`<div class="lg">${NOTE}</div>`;
 const c={video:0,spartito:0,foto:0,audio:0};m.forEach(x=>c[x.type]=(c[x.type]||0)+1);
 const chips=(LK.length?`<span class="chip">${ic('link')}${LK.length}</span>`:'')+(Object.keys(c).filter(k=>c[k]).map(k=>`<span class="chip">${ic(k)}${c[k]}</span>`).join('')||(LK.length?'':'<span class="chip">Vuota</span>'));
-return `<div class="folder" data-id="${b.id}" style="--h:${hue(b)}"><div class="cover ${n>1?'m'+n:''}">${cells}<div class="bd">${b.ord||''}</div></div><div class="info"><div class="fn">${esc(b.name)}</div><div class="chips">${chips}</div>${b.desc?`<div class="fd">${esc(b.desc)}</div>`:''}</div></div>`}).join('')+'</div><div class="cp">Copyright © Ignazio Paolicelli</div>';
+return `<div class="folder" data-id="${b.id}" style="--h:${hue(b)}"><div class="cover ${n>1&&!(b.seed&&ART[b.ord])?'m'+n:''}">${cells}<div class="bd">${b.ord||''}</div></div><div class="info"><div class="fn">${esc(b.name)}</div><div class="chips">${chips}</div>${b.desc?`<div class="fd">${esc(b.desc)}</div>`:''}</div></div>`}).join('')+'</div><div class="cp">Copyright © Ignazio Paolicelli</div>';
 document.querySelectorAll('.folder').forEach(f=>f.onclick=()=>openF(f.dataset.id))}
 async function newBrano(){const n=await ask('Nuovo brano');if(!n)return;const br=await all('brani');const b={id:uid(),name:n,desc:'',ord:br.reduce((m,x)=>Math.max(m,x.ord||0),0)+1,upd:Date.now()};await put('brani',b);openF(b.id)}
 
@@ -278,7 +331,7 @@ const tiles=(l,k)=>`<div class="mg ${k==='foto'?'sq':''}">`+linkT(k)+l.map(x=>`<
 const auds=l=>'<div class="al">'+l.map(x=>`<div class="au" data-i="${items.indexOf(x)}"><div class="q">${ic('audio')}</div><div class="n">${esc(x.name)}<small>${fmt(x.dur)||'Audio'}</small></div></div>`).join('')+'</div>';
 const sec=k=>{const l=G[k];if(!l.length&&(k==='foto'||k==='audio'))return'';
 return `<div class="sec"><div class="sh"><div class="ico">${ic(k)}</div><h2>${SEC[k]}<small>${l.length+nL(k)||''}</small></h2>${TOK&&(k==='video'||k==='spartito')?`<button class="pill soft" data-lk="${k}">${ic('link')}Aggiungi link fissi</button>`:''}</div>${l.length||nL(k)?(k==='audio'?auds(l):tiles(l,k)):`<div class="drop">Nessun ${k==='video'?'video':'spartito'} ancora.</div>`}</div>`};
-$('#main').innerHTML=`<div class="card"><div class="lab">Descrizione</div><textarea id="ds" placeholder="Scrivi una breve descrizione del brano…">${esc(b.desc)}</textarea></div>`+Object.keys(SEC).map(sec).join('')+
+$('#main').innerHTML=(b.seed&&ART[b.ord]?`<div class="banner">${ART[b.ord]}</div>`:'')+`<div class="card"><div class="lab">Descrizione</div><textarea id="ds" placeholder="Scrivi una breve descrizione del brano…">${esc(b.desc)}</textarea></div>`+Object.keys(SEC).map(sec).join('')+
 `<div class="cp">Copyright © Ignazio Paolicelli</div>`;
 document.querySelectorAll('[data-lk]').forEach(x=>x.onclick=()=>editLinks(b,x.dataset.lk));
 let tm;$('#ds').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>{b.desc=e.target.value;b.upd=Date.now();put('brani',b)},400)};
@@ -327,11 +380,13 @@ $('#vC').addEventListener('touchend',e=>{const x=items[vi];if(sx===null||!x||isP
 /* ---------- Tasto Indietro ---------- */
 addEventListener('popstate',()=>{if($('#vw').classList.contains('on')){closeV();if(cur)openF(cur.id,false);return}if(cur)home()});
 
+$('#scene').innerHTML=SCENE;
+{const sn=$('#snow');for(let i=0;i<28;i++){const f=document.createElement('i');f.textContent='❄';f.style.cssText=`left:${Math.random()*100}%;font-size:${8+Math.random()*12}px;animation-duration:${8+Math.random()*10}s;animation-delay:${-Math.random()*18}s;opacity:${.4+Math.random()*.5}`;sn.append(f)}}
 /* ---------- Avvio + 7 brani iniziali ---------- */
 async function seed(){let done=false;try{done=localStorage.getItem('brani-seed')==='1'}catch(e){}
 const br=await all('brani');if(done||br.some(b=>b.seed))return;
 for(let i=0;i<SEED.length;i++)await put('brani',{id:uid(),name:SEED[i],desc:'',ord:i+1,seed:1,upd:Date.now()});
 br.forEach((b,i)=>{if(!b.ord){b.ord=SEED.length+i+1;put('brani',b)}});
 try{localStorage.setItem('brani-seed','1')}catch(e){}}
-openDB().then(async()=>{navigator.storage?.persist?.();await seed();await loadLinks();home()}).catch(()=>{$('#main').innerHTML='<div class="empty">Archivio non disponibile in questo browser.</div>'});
+openDB().then(async()=>{navigator.storage?.persist?.();await seed();for(const b of await all('brani')){const i=SEED.indexOf(b.name);if(b.seed&&i>=0&&b.ord!==i+1){b.ord=i+1;await put('brani',b)}}await loadLinks();home()}).catch(()=>{$('#main').innerHTML='<div class="empty">Archivio non disponibile in questo browser.</div>'});
 </script></body></html>
