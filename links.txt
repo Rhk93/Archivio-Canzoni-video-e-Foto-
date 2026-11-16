@@ -11,6 +11,9 @@ video: Chitarra 1 | https://mega.nz/file/9ld3jawI#5PrjR2XOnkWf6IwJNVh-FCRsTrVLBF
 spartito: Spartito 1 e 2 | https://mega.nz/file/xo1TnATQ#XJGKvpGd65gE2KQLOe3j9-Bd61IVBH-DQj7lT3JjdC0
 
 # 3 A la nanita nana
+spartito: Spartito | https://mega.nz/file/ZhtSVaCK#ejWAP6N-aU-kMmqSRL5thyE2tqq53yivT-EJbCTj6dw
+video: Chitarra 1 | https://mega.nz/file/N8cm3TgR#E4wfgyzhFrh8fHMCxbDkpRgjX9sRI1KJqqGSc2FD_5U
+video: Chitarra 2 | https://mega.nz/file/wgEwQYLD#PRw6Uogf7dNTdAP2YN2PeWf0pFEvtvJygv2tWF9EDTg
 
 # 4 Polar Express – When Christmas comes to town
 
