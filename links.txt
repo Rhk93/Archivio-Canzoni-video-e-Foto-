@@ -6,6 +6,7 @@ spartito: Spartito | https://mega.nz/file/p8kFyBpY#lwbBeGOtUPHx4970NRYaHtqSMvGVQ
 # 2 Il Grinch – Welcome Christmas
 video: Chitarra 2 | https://mega.nz/file/BhUkjLQb#WinuX_03jfD7vgOtU7vlk2_Ai2Gf06rv9w6kUNeynLI
 video: Chitarra 1 | https://mega.nz/file/9ld3jawI#5PrjR2XOnkWf6IwJNVh-FCRsTrVLBFn8oa9PutJBNQQ
+spartito: Spartito 1 e 2 | https://mega.nz/file/xo1TnATQ#XJGKvpGd65gE2KQLOe3j9-Bd61IVBH-DQj7lT3JjdC0
 
 # 3 A la nanita nana
 
