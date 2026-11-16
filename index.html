@@ -53,6 +53,12 @@ textarea{width:100%;border:0;background:none;color:var(--txt);font:inherit;resiz
 .mg.sq .tile .im{aspect-ratio:1}
 .tile .nm{font-size:.78em;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mg.sq .tile .nm{display:none}
+.lrow{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:10px 12px}
+.lrow .n{flex:1;min-width:0;overflow:hidden}
+.lrow small{display:block;color:var(--sub);font-size:.75em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow button{border:0;background:none;color:#e5484d;cursor:pointer;padding:4px}
+.tile.lk{display:block;text-decoration:none;color:var(--txt)}
+.tile.lk .nm{color:var(--acc);font-weight:600}
 .tile.add{border:2px dashed var(--line);background:none}
 .tile.add .im{background:none;color:var(--acc)}
 .tile.add .im .si{width:2em;height:2em}
@@ -136,7 +142,7 @@ audio:'<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="
 plus:'<path d="M12 5v14M5 12h14"/>',back:'<path d="M15 5l-7 7 7 7"/>',next:'<path d="M9 5l7 7-7 7"/>',
 set:'<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
 more:'<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>',
-trash:'<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>',close:'<path d="M6 6l12 12M18 6L6 18"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>'};
+link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',trash:'<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>',close:'<path d="M6 6l12 12M18 6L6 18"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>'};
 const ic=n=>'<svg class="si" viewBox="0 0 24 24">'+PATHS[n]+'</svg>';
 const NOTE='<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M24 46V18l22-6v28"/><path d="M24 26l22-6"/><circle cx="17.5" cy="46" r="6.5" fill="currentColor" stroke="none"/><circle cx="39.5" cy="40" r="6.5" fill="currentColor" stroke="none"/></svg>';
 const PLAY='<div class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></div>';
@@ -154,6 +160,15 @@ const url=b=>{if(!b)return'';const u=URL.createObjectURL(b);urls.push(u);return 
 const clearUrls=()=>{urls.forEach(u=>URL.revokeObjectURL(u));urls=[]};
 const fmt=s=>{if(!s||!isFinite(s))return'';s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 const isPdf=x=>(x.mime||x.type)==='application/pdf'||/\.pdf$/i.test(x.name||'');
+let LINKS={};
+const REPO='Rhk93/Archivio-Canzoni-video-e-Foto-';
+let TOK='';try{TOK=localStorage.getItem('brani-tok')||''}catch(e){}
+const gh=(p,o={})=>fetch('https://api.github.com/repos/'+REPO+p,{cache:'no-store',...o,headers:{Authorization:'Bearer '+TOK,Accept:'application/vnd.github+json',...(o.headers||{})}});
+async function loadLinks(){try{const r=TOK?await gh('/contents/links.txt',{headers:{Accept:'application/vnd.github.raw+json'}}):await fetch('links.txt?v='+Date.now(),{cache:'no-store'});if(!r.ok)return;const L={};let k=null;
+(await r.text()).split(/\r?\n/).forEach(l=>{l=l.trim();if(!l||l.startsWith('//'))return;const h=l.match(/^#\s*(\d+)/);if(h){k=h[1];L[k]=L[k]||[];return}
+const m=l.match(/^(video|spartito)\s*:\s*(.*)$/i);if(m&&k){const p=m[2].split('|').map(s=>s.trim());const u=p.length>1?p[1]:p[0];if(/^https?:\/\//.test(u))L[k].push({type:m[1].toLowerCase(),title:p.length>1&&p[0]?p[0]:'Link',url:u})}});LINKS=L}catch(e){}}
+const ytId=u=>(u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/)||[])[1];
+const ytImg=u=>{const i=ytId(u);return i?`https://img.youtube.com/vi/${i}/hqdefault.jpg`:''};
 const hue=b=>HUES[((b.ord||1)-1)%HUES.length];
 
 /* ---------- Impostazioni ---------- */
@@ -186,7 +201,7 @@ mq.addEventListener?.('change',apply);apply();
 
 /* ---------- Finestre ---------- */
 function sheet(html){const o=document.createElement('div');o.className='ov';o.innerHTML='<div class="sheet">'+html+'</div>';o.onclick=e=>{if(e.target===o)o.remove()};document.body.append(o);return o}
-function ask(t,v=''){return new Promise(res=>{const o=sheet(`<h3>${t}</h3><input type="text" value="${esc(v)}" placeholder="Nome del brano"><div class="row"><button>Annulla</button><button class="b1">OK</button></div>`);const i=o.querySelector('input');setTimeout(()=>i.focus(),200);const[b2,b1]=o.querySelectorAll('.row button');b2.onclick=()=>{o.remove();res(null)};const ok=()=>{o.remove();res(i.value.trim()||null)};b1.onclick=ok;i.onkeydown=e=>{if(e.key==='Enter')ok()}})}
+function ask(t,v='',ph='Nome del brano'){return new Promise(res=>{const o=sheet(`<h3>${t}</h3><input type="text" value="${esc(v)}" placeholder="${ph}"><div class="row"><button>Annulla</button><button class="b1">OK</button></div>`);const i=o.querySelector('input');setTimeout(()=>i.focus(),200);const[b2,b1]=o.querySelectorAll('.row button');b2.onclick=()=>{o.remove();res(null)};const ok=()=>{o.remove();res(i.value.trim()||null)};b1.onclick=ok;i.onkeydown=e=>{if(e.key==='Enter')ok()}})}
 function conf(t){return new Promise(res=>{const o=sheet(`<h3>${t}</h3><div class="row"><button>Annulla</button><button class="rd">Elimina</button></div>`);const[n,y]=o.querySelectorAll('.row button');y.onclick=()=>{o.remove();res(true)};n.onclick=()=>{o.remove();res(false)}})}
 function menu(list){const o=sheet('<div class="list">'+list.map((x,i)=>`<button data-i="${i}" class="${x.red?'red':''}">${ic(x.i)}${x.t}</button>`).join('')+'</div>');o.querySelectorAll('.list button').forEach(b=>b.onclick=()=>{o.remove();list[b.dataset.i].f()})}
 function alertBox(t){const o=sheet(`<h3>${t}</h3><div class="row"><button class="b1">OK</button></div>`);o.querySelector('button').onclick=()=>o.remove()}
@@ -199,6 +214,7 @@ const o=sheet(`<h3>Personalizza</h3>
 <div class="inl"><span>Colore sfondo</span><input type="color" id="sB" value="${S.bg||'#f4f5fb'}"><button class="lk" id="sBr">Predefinito</button></div>
 <div class="lab st">Carattere</div><div class="sg" id="sF">${Object.entries(FONTS).map(([k,v])=>`<button data-k="${k}" style="font-family:${v[1].replace(/"/g,"'")}">${v[0]}</button>`).join('')}</div>
 <div class="lab st">Dimensione testo</div><input type="range" id="sS" min="13" max="21" value="${S.size}">
+<div class="lab st">Docente</div><div class="inl"><span>${TOK?'Modalità docente attiva ✓':'Modalità docente (modifica link fissi)'}</span><button class="lk" id="sTk">${TOK?'Esci':'Attiva'}</button></div>
 <div class="row"><button id="sR">Ripristina</button><button class="b1" id="sOk">Fatto</button></div>
 <div class="cp">Copyright © Ignazio Paolicelli</div>`);
 const mark=()=>{o.querySelectorAll('#sT button').forEach(b=>b.classList.toggle('on',b.dataset.k===S.theme));o.querySelectorAll('#sC button').forEach(b=>b.classList.toggle('on',b.dataset.c===S.acc));o.querySelectorAll('#sF button').forEach(b=>b.classList.toggle('on',b.dataset.k===S.font))};
@@ -207,7 +223,31 @@ o.querySelectorAll('#sT button').forEach(b=>b.onclick=()=>{const p=PRE[b.dataset
 o.querySelectorAll('#sC button').forEach(b=>b.onclick=()=>set('acc',b.dataset.c));
 o.querySelectorAll('#sF button').forEach(b=>b.onclick=()=>set('font',b.dataset.k));
 $('#sCc').oninput=e=>set('acc',e.target.value);$('#sB').oninput=e=>set('bg',e.target.value);$('#sBr').onclick=()=>set('bg','');
-$('#sS').oninput=e=>set('size',+e.target.value);$('#sOk').onclick=()=>o.remove();$('#sR').onclick=()=>{S={...DEF};apply();o.remove();settings()}}
+$('#sS').oninput=e=>set('size',+e.target.value);
+$('#sTk').onclick=async()=>{o.remove();if(TOK){TOK='';try{localStorage.removeItem('brani-tok')}catch(e){}alertBox('Modalità docente disattivata.')}else await teacherOn();await loadLinks();cur?openF(cur.id,false):home()};$('#sOk').onclick=()=>o.remove();$('#sR').onclick=()=>{S={...DEF};apply();o.remove();settings()}}
+
+/* ---------- Modalità docente ---------- */
+async function teacherOn(){const t=await ask('Incolla il tuo codice (token GitHub)','','github_pat_…');if(!t)return;TOK=t;
+try{const r=await gh('');const j=await r.json();if(!r.ok||!j.permissions?.push)throw 0;try{localStorage.setItem('brani-tok',t)}catch(e){}alertBox('Modalità docente attiva ✓')}catch(e){TOK='';alertBox('Codice non valido o senza permesso di scrittura.')}}
+async function saveLinks(){const br=(await all('brani')).sort((a,b)=>(a.ord||999)-(b.ord||999)),out=["// LINK FISSI DEI BRANI – modificati dall'app (modalità docente)",''],done=new Set();
+const add=(k,n)=>{done.add(String(k));out.push(`# ${k} ${n}`);(LINKS[k]||[]).forEach(x=>out.push(`${x.type}: ${x.title} | ${x.url}`));out.push('')};
+br.forEach(b=>b.ord&&add(b.ord,b.name));Object.keys(LINKS).forEach(k=>{if(!done.has(k))add(k,'')});
+let sha;const g=await gh('/contents/links.txt');if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw new Error('accesso negato ('+g.status+')');
+const p=await gh('/contents/links.txt',{method:'PUT',body:JSON.stringify({message:'Aggiorna link fissi',content:btoa(unescape(encodeURIComponent(out.join('\n')))),...(sha?{sha}:{})})});if(!p.ok)throw new Error('GitHub '+p.status)}
+function editLinks(b){let L=(LINKS[b.ord]||[]).map(x=>({...x})),ty='video';
+const o=sheet(`<h3>Link fissi · ${b.ord}. ${esc(b.name)}</h3><div class="list" id="eL"></div>
+<div class="lab st">Nuovo link</div><div class="sg" id="eT"><button data-k="video">Video</button><button data-k="spartito">Spartito</button></div>
+<input type="text" id="eTi" placeholder="Titolo (es. Chitarra 1)"><input type="text" id="eU" placeholder="Incolla il link https://…" style="margin-top:8px">
+<div class="row"><button id="eAdd">＋ Aggiungi alla lista</button></div>
+<div class="row"><button id="eNo">Annulla</button><button class="b1" id="eOk">Salva</button></div>`);
+const rd=()=>{o.querySelectorAll('#eT button').forEach(x=>x.classList.toggle('on',x.dataset.k===ty));
+$('#eL').innerHTML=L.length?L.map((x,i)=>`<div class="lrow">${ic(x.type)}<div class="n">${esc(x.title)}<small>${esc(x.url)}</small></div><button data-d="${i}">${ic('trash')}</button></div>`).join(''):'<div class="sub">Nessun link ancora.</div>';
+$('#eL').querySelectorAll('[data-d]').forEach(x=>x.onclick=()=>{L.splice(+x.dataset.d,1);rd()})};rd();
+o.querySelectorAll('#eT button').forEach(x=>x.onclick=()=>{ty=x.dataset.k;rd()});
+$('#eAdd').onclick=()=>{const u=$('#eU').value.trim();if(!/^https?:\/\//.test(u)){$('#eU').focus();return}L.push({type:ty,title:$('#eTi').value.trim().replace(/\|/g,'/')||'Link',url:u});$('#eTi').value='';$('#eU').value='';rd()};
+$('#eNo').onclick=()=>o.remove();
+$('#eOk').onclick=async()=>{const bt=$('#eOk');bt.textContent='Salvo…';bt.disabled=true;const old=LINKS[b.ord];
+try{LINKS[b.ord]=L;await saveLinks();o.remove();openF(b.id,false);alertBox('Salvato ✓ Gli alunni lo vedranno tra circa un minuto.')}catch(e){LINKS[b.ord]=old;bt.textContent='Salva';bt.disabled=false;alertBox('Errore nel salvataggio: '+esc(e.message||e))}}}
 
 /* ---------- Elenco brani ---------- */
 async function home(){cur=null;clearUrls();window.scrollTo(0,0);
@@ -217,9 +257,10 @@ $('#bS').onclick=settings;$('#bN').onclick=newBrano;
 if(!br.length){$('#main').innerHTML='<div class="empty">Nessun brano. Tocca <b>Nuovo</b> per crearne uno.</div><div class="cp">Copyright © Ignazio Paolicelli</div>';return}
 $('#main').innerHTML='<div class="grid">'+br.map(b=>{const m=md.filter(x=>x.branoId===b.id).sort((x,y)=>y.at-x.at);
 const th=m.filter(x=>x.thumb).slice(0,4);const n=th.length>=4?4:th.length>=2?2:th.length;
-const cells=n?th.slice(0,n).map(x=>`<div class="t" style="background-image:url(${url(x.thumb)})"></div>`).join(''):`<div class="lg">${NOTE}</div>`;
+const LK=LINKS[b.ord]||[],yc=LK.map(x=>ytImg(x.url)).filter(Boolean)[0];
+const cells=n?th.slice(0,n).map(x=>`<div class="t" style="background-image:url(${url(x.thumb)})"></div>`).join(''):yc?`<div class="t" style="background-image:url(${yc})"></div>`:`<div class="lg">${NOTE}</div>`;
 const c={video:0,spartito:0,foto:0,audio:0};m.forEach(x=>c[x.type]=(c[x.type]||0)+1);
-const chips=Object.keys(c).filter(k=>c[k]).map(k=>`<span class="chip">${ic(k)}${c[k]}</span>`).join('')||'<span class="chip">Vuota</span>';
+const chips=(LK.length?`<span class="chip">${ic('link')}${LK.length}</span>`:'')+(Object.keys(c).filter(k=>c[k]).map(k=>`<span class="chip">${ic(k)}${c[k]}</span>`).join('')||(LK.length?'':'<span class="chip">Vuota</span>'));
 return `<div class="folder" data-id="${b.id}" style="--h:${hue(b)}"><div class="cover ${n>1?'m'+n:''}">${cells}<div class="bd">${b.ord||''}</div></div><div class="info"><div class="fn">${esc(b.name)}</div><div class="chips">${chips}</div>${b.desc?`<div class="fd">${esc(b.desc)}</div>`:''}</div></div>`}).join('')+'</div><div class="cp">Copyright © Ignazio Paolicelli</div>';
 document.querySelectorAll('.folder').forEach(f=>f.onclick=()=>openF(f.dataset.id))}
 async function newBrano(){const n=await ask('Nuovo brano');if(!n)return;const br=await all('brani');const b={id:uid(),name:n,desc:'',ord:br.reduce((m,x)=>Math.max(m,x.ord||0),0)+1,upd:Date.now()};await put('brani',b);openF(b.id)}
@@ -231,12 +272,15 @@ $('#hd').innerHTML=`<button class="ib" id="bB" title="Indietro">${ic('back')}</b
 $('#bB').onclick=()=>history.back();
 $('#bM').onclick=()=>menu([{i:'edit',t:'Rinomina brano',f:async()=>{const n=await ask('Rinomina brano',b.name);if(n){b.name=n;b.upd=Date.now();await put('brani',b);openF(b.id,false)}}},{i:'set',t:'Personalizza aspetto',f:settings},{i:'trash',t:'Elimina brano',red:1,f:async()=>{if(await conf('Eliminare “'+esc(b.name)+'” e tutto il suo contenuto?')){for(const m of await mediaOf(b.id))await del('media',m.id);await del('brani',b.id);history.back()}}}]);
 const m=(await mediaOf(id)).sort((x,y)=>x.at-y.at);const G={};Object.keys(SEC).forEach(k=>G[k]=m.filter(x=>x.type===k));items=[...G.video,...G.spartito,...G.foto,...G.audio];
-const tiles=(l,k)=>`<div class="mg ${k==='foto'?'sq':''}">`+l.map(x=>`<div class="tile ${k==='spartito'?'sp':''}" data-i="${items.indexOf(x)}"><div class="im" style="${x.thumb?`background-image:url(${url(x.thumb)})`:''}">${k==='video'?PLAY+(x.dur?`<span class="du">${fmt(x.dur)}</span>`:''):x.thumb?'':ic(k)}</div><div class="nm">${esc(x.name)}</div></div>`).join('')+`<div class="tile add ${k==='spartito'?'sp':''}" data-add="${k}"><div class="im">${ic('plus')}</div><div class="nm">Aggiungi altri</div></div></div>`;
+const LK=LINKS[b.ord]||[],nL=k=>LK.filter(x=>x.type===k).length;
+const linkT=k=>LK.filter(x=>x.type===k).map(x=>{const y=ytImg(x.url);return `<a class="tile lk ${k==='spartito'?'sp':''}" href="${esc(x.url)}" target="_blank" rel="noopener"><div class="im" style="${y?`background-image:url(${y})`:''}">${y?PLAY:ic('link')}</div><div class="nm">${esc(x.title)}</div></a>`}).join('');
+const tiles=(l,k)=>`<div class="mg ${k==='foto'?'sq':''}">`+linkT(k)+l.map(x=>`<div class="tile ${k==='spartito'?'sp':''}" data-i="${items.indexOf(x)}"><div class="im" style="${x.thumb?`background-image:url(${url(x.thumb)})`:''}">${k==='video'?PLAY+(x.dur?`<span class="du">${fmt(x.dur)}</span>`:''):x.thumb?'':ic(k)}</div><div class="nm">${esc(x.name)}</div></div>`).join('')+`<div class="tile add ${k==='spartito'?'sp':''}" data-add="${k}"><div class="im">${ic('plus')}</div><div class="nm">Aggiungi altri</div></div></div>`;
 const auds=l=>'<div class="al">'+l.map(x=>`<div class="au" data-i="${items.indexOf(x)}"><div class="q">${ic('audio')}</div><div class="n">${esc(x.name)}<small>${fmt(x.dur)||'Audio'}</small></div></div>`).join('')+`<div class="drop" data-add="audio">+ Aggiungi altri audio</div></div>`;
 const sec=k=>{const l=G[k];if(!l.length&&(k==='foto'||k==='audio'))return'';
-return `<div class="sec"><div class="sh"><div class="ico">${ic(k)}</div><h2>${SEC[k]}<small>${l.length||''}</small></h2><button class="pill soft" data-add="${k}">${ic('plus')}Aggiungi</button></div>${l.length?(k==='audio'?auds(l):tiles(l,k)):`<div class="drop" data-add="${k}">Nessun ${k==='video'?'video':'spartito'}. Tocca per aggiungere${k==='spartito'?' PDF o foto':''} (puoi sceglierne più di uno).</div>`}</div>`};
-$('#main').innerHTML=`<div class="card"><div class="lab">Descrizione</div><textarea id="ds" placeholder="Scrivi una breve descrizione del brano…">${esc(b.desc)}</textarea></div>`+Object.keys(SEC).map(sec).join('')+
+return `<div class="sec"><div class="sh"><div class="ico">${ic(k)}</div><h2>${SEC[k]}<small>${l.length+nL(k)||''}</small></h2><button class="pill soft" data-add="${k}">${ic('plus')}Aggiungi</button></div>${l.length||nL(k)?(k==='audio'?auds(l):tiles(l,k)):`<div class="drop" data-add="${k}">Nessun ${k==='video'?'video':'spartito'}. Tocca per aggiungere${k==='spartito'?' PDF o foto':''} (puoi sceglierne più di uno).</div>`}</div>`};
+$('#main').innerHTML=`<div class="card"><div class="lab">Descrizione</div><textarea id="ds" placeholder="Scrivi una breve descrizione del brano…">${esc(b.desc)}</textarea></div>`+(TOK?`<button class="pill" id="bL">${ic('link')}Gestisci link fissi</button>`:'')+Object.keys(SEC).map(sec).join('')+
 `<div class="sec" style="display:flex;gap:8px;flex-wrap:wrap">${!G.foto.length?`<button class="pill soft" data-add="foto">${ic('foto')}Aggiungi foto</button>`:''}${!G.audio.length?`<button class="pill soft" data-add="audio">${ic('audio')}Aggiungi audio</button>`:''}</div><div class="cp">Copyright © Ignazio Paolicelli</div>`;
+$('#bL')?.addEventListener('click',()=>editLinks(b));
 let tm;$('#ds').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>{b.desc=e.target.value;b.upd=Date.now();put('brani',b)},400)};
 document.querySelectorAll('[data-i]').forEach(t=>t.onclick=()=>view(+t.dataset.i));
 document.querySelectorAll('[data-add]').forEach(t=>t.onclick=()=>{pend=t.dataset.add;$('#fi').accept=ACC[pend];$('#fi').click()})}
@@ -289,5 +333,5 @@ const br=await all('brani');if(done||br.some(b=>b.seed))return;
 for(let i=0;i<SEED.length;i++)await put('brani',{id:uid(),name:SEED[i],desc:'',ord:i+1,seed:1,upd:Date.now()});
 br.forEach((b,i)=>{if(!b.ord){b.ord=SEED.length+i+1;put('brani',b)}});
 try{localStorage.setItem('brani-seed','1')}catch(e){}}
-openDB().then(async()=>{navigator.storage?.persist?.();await seed();home()}).catch(()=>{$('#main').innerHTML='<div class="empty">Archivio non disponibile in questo browser.</div>'});
+openDB().then(async()=>{navigator.storage?.persist?.();await seed();await loadLinks();home()}).catch(()=>{$('#main').innerHTML='<div class="empty">Archivio non disponibile in questo browser.</div>'});
 </script></body></html>
