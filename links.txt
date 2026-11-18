@@ -27,7 +27,6 @@ video: Chitarra 2 | https://mega.nz/file/Rt92jZ4L#zoqyR3Cqmy17-m8vaX5CD80Gjcxzud
 video: Chitarra 1 | https://mega.nz/file/cx9WhDiA#maOOwj0nKrPrm4b-_G9QTtnLuiqE5cuQYpip98DLuvg
 
 # 6 Home Alone
-spartito: Spartito - Chitarra 1 | https://mega.nz/file/1wMnxJrC#Zigl7WRB9J3iSYcIQF9Ou1REzkYIImQ3aXQyKQolqts
 spartito: Chitarra 2 | https://mega.nz/file/MgVTnAaJ#xprSPq_DtRuhmaoYwzP56gu2uxZtz-xB0w0ChxVMXW4
 
 # 7 Frozen – Let It Go
