@@ -4,6 +4,7 @@
 spartito: Spartito | https://mega.nz/file/p8kFyBpY#lwbBeGOtUPHx4970NRYaHtqSMvGVQqyRBVeuKzPCJYg
 video: Chitarra 1 | https://mega.nz/file/xotBwYDL#DrlCebPlifNNyo5fBtFtIfJ5NhpG4kRQ1Iq3w3Y11xM
 video: Chitarra 2 | https://mega.nz/file/hlNDgQiC#n8cxcjDYQ6RuDuz-2XVnY48Z7FiEDqbSKcqmt0y3Ai4
+spartito: Spartito chitarra 2 | https://mega.nz/file/F4F1RYLZ#8AhAysbyonmOkz9KHVEes9WvISAUpdl39B-pA3_4eVU
 
 # 2 A la nanita nana
 video: Chitarra 1 | https://mega.nz/file/9ld3jawI#5PrjR2XOnkWf6IwJNVh-FCRsTrVLBFn8oa9PutJBNQQ
